@@ -101,46 +101,36 @@ def update_exif_with_dimensions(image_path, width, height):
     except Exception as e:
         print(f"Failed to update EXIF data for {image_path}: {e}")
 
+def process_input_filepath(file_path, filename):
+    if os.path.isfile(file_path) and filename.lower().endswith(('.jpg', '.jpeg', '.png')):
+        exif_data = get_exif_data(file_path)
+
+    if exif_data:
+        width, length = get_image_dimensions(exif_data)
+
+        if width and length:
+            print(f"Image: {filename}")
+            print(f"Width: {width}, Length: {length}\n")
+        else:
+            print(f"Image: {filename} has no EXIF width/length data, reading from image...\n")
+            img = Image.open(file_path)
+            width, height = img.size
+            update_exif_with_dimensions(file_path, width, height)
+    else:
+        print(f"Image: {filename} has no EXIF width/length data, reading from image...\n")
+        img = Image.open(file_path)
+        width, height = img.size
+        update_exif_with_dimensions(file_path, width, height)
+
 # Main function to process the input (directory or file)
 def process_input(path):
     if os.path.isdir(path):
         # Process images in the directory
         for filename in os.listdir(path):
             file_path = os.path.join(path, filename)
-
-            # Check if it's a valid image file
-            if os.path.isfile(file_path) and filename.lower().endswith(('.jpg', '.jpeg', '.png')):
-                exif_data = get_exif_data(file_path)
-
-                if exif_data:
-                    width, length = get_image_dimensions(exif_data)
-
-                    if width and length:
-                        print(f"Image: {filename}")
-                        print(f"Width: {width}, Length: {length}\n")
-                    else:
-                        print(f"Image: {filename} has no EXIF width/length data, reading from image...\n")
-                        img = Image.open(file_path)
-                        width, height = img.size
-                        update_exif_with_dimensions(file_path, width, height)
-                else:
-                    print(f"Image: {filename} has no EXIF data.\n")
+            process_input_filepath(file_path, filename)
     elif os.path.isfile(path) and path.lower().endswith(('.jpg', '.jpeg', '.png')):
-        # Process the single image file
-        exif_data = get_exif_data(path)
-        
-        if exif_data:
-            width, length = get_image_dimensions(exif_data)
-            if width and length:
-                print(f"Image: {os.path.basename(path)}")
-                print(f"Width: {width}, Length: {length}\n")
-            else:
-                print(f"Image: {os.path.basename(path)} has no EXIF width/length data, reading from image...\n")
-                img = Image.open(path)
-                width, height = img.size
-                update_exif_with_dimensions(path, width, height)
-        else:
-            print(f"Image: {os.path.basename(path)} has no EXIF data.\n")
+        process_input_filepath(path, path)
     else:
         print(f"The path {path} is not a valid directory or image file.")
 
