@@ -10,12 +10,16 @@ from sklearn.cluster import DBSCAN
 import numpy as np
 from geopy.distance import geodesic
 import plotly.graph_objects as go
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Register HEIF/HEIC support with Pillow
 register_heif_opener()
 
 # Replace with your OpenCage Geocoder API key
-OPENCAGE_API_KEY = "7074251d8a7c46e191ac25a08ff67005"
+OPENCAGE_API_KEY = os.getenv("OPENCAGE_API_KEY")
 
 def get_decimal_from_dms(dms, ref):
     """Convert DMS (degrees, minutes, seconds) to decimal degrees."""
@@ -131,7 +135,6 @@ def plot_clusters_with_connections(clusters, directory, cluster_to_filenames):
     meta_data = []
 
     for cluster_id, cluster_points in clusters.items():
-        print("4")
         # Calculate the cluster center
         lats = [p[0] for p in cluster_points]
         lons = [p[1] for p in cluster_points]
@@ -144,13 +147,11 @@ def plot_clusters_with_connections(clusters, directory, cluster_to_filenames):
 
         # Get a label for the cluster
         city_label = get_nearest_city(center_lat, center_lon)
-        print(f"5 {city_label} \ {center_lat} \ {center_lon}")
         cluster_labels.append(city_label)
         cluster_centers.append((center_lat, center_lon))
 
         # Map filenames to metadata
         for filename in cluster_to_filenames[cluster_id]:
-            print(f"6")
             capture_time = next((p[2] for p in cluster_points if p[2] is not None), None)
             meta_data.append({
                 "file_name": os.path.basename(filename),
@@ -193,12 +194,6 @@ def plot_clusters_with_connections(clusters, directory, cluster_to_filenames):
         showlegend=False
     ))
 
-    print(f"7")
-    # Save the map as PNG
-    # fig.write_image(os.path.join(directory, "map.png"), engine="kaleido")
-
-    print(f"8")
-
     # Save metadata as CSV
     meta_csv_path = os.path.join(directory, "meta.csv")
     with open(meta_csv_path, mode='w', newline='', encoding='utf-8') as csvfile:
@@ -216,7 +211,6 @@ if __name__ == "__main__":
         print("Usage: python script.py <directory_path>")
         sys.exit(1)
 
-    print("1")
     directory = sys.argv[1]
     if not os.path.isdir(directory):
         print(f"Invalid directory: {directory}")
@@ -237,6 +231,5 @@ if __name__ == "__main__":
     # Cluster locations based on 100-mile radius
     clusters, cluster_to_files = cluster_coordinates(locations, location_to_file, max_distance_miles=100)
 
-    print(f"3 {clusters}")
     # Plot clusters and save outputs
     plot_clusters_with_connections(clusters, directory, cluster_to_files)
