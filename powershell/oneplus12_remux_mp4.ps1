@@ -1,5 +1,15 @@
-# Get the current directory
-$directory = Get-Location
+# Get the directory path from input
+param (
+    [string]$directory = $(Get-Location)  # Default to the current directory if no input is provided
+)
+
+# Validate the input directory
+if (-Not (Test-Path $directory)) {
+    Write-Host "The specified directory does not exist: $directory" -ForegroundColor Red
+    exit
+}
+
+Write-Host "Processing files in directory: $directory" -ForegroundColor Cyan
 
 # Loop through all MP4 files in the directory
 Get-ChildItem -Path $directory -Filter "*.mp4" | ForEach-Object {
@@ -8,18 +18,15 @@ Get-ChildItem -Path $directory -Filter "*.mp4" | ForEach-Object {
 
     # Call FFmpeg to remux the file
     Write-Host "Remuxing $inputFile to $outputFile"
-    ffmpeg -i "$inputFile" -c copy "$outputFile"
+    ffmpeg -y -i "$inputFile" -c copy -map_metadata 0 "$outputFile"
 
     # Check if remuxing was successful
     if (Test-Path $outputFile) {
-        Write-Host "Successfully remuxed: $inputFile -> $outputFile"
+        Write-Host "Successfully remuxed: $inputFile -> $outputFile" -ForegroundColor Green
     } else {
-        Write-Host "Failed to remux: $inputFile"
+        Write-Host "Failed to remux: $inputFile" -ForegroundColor Red
     }
 }
-
-# Get the current directory
-$directory = Get-Location
 
 # Loop through all MKV files in the directory
 Get-ChildItem -Path $directory -Filter "*.mkv" | ForEach-Object {
@@ -28,16 +35,16 @@ Get-ChildItem -Path $directory -Filter "*.mkv" | ForEach-Object {
 
     # Call FFmpeg to remux the MKV back to MP4
     Write-Host "Converting $inputFile back to $outputFile"
-    ffmpeg -y -i "$inputFile" -c copy "$outputFile"
+    ffmpeg -y -i "$inputFile" -c copy -map_metadata 0 "$outputFile"
 
     # Check if the conversion was successful
     if (Test-Path $outputFile) {
-        Write-Host "Successfully converted: $inputFile -> $outputFile"
+        Write-Host "Successfully converted: $inputFile -> $outputFile" -ForegroundColor Green
 
-        # Overwrite the original MP4 file by replacing it with the new one
+        # Overwrite the original MKV file by replacing it with the new one
         Remove-Item -Force "$inputFile"
-        Write-Host "Deleted original MKV: $inputFile"
+        Write-Host "Deleted original MKV: $inputFile" -ForegroundColor Yellow
     } else {
-        Write-Host "Failed to convert: $inputFile"
+        Write-Host "Failed to convert: $inputFile" -ForegroundColor Red
     }
 }
