@@ -1,0 +1,7 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\Remux MP4]
+@="Remux MP4"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\Remux MP4\command]
+@="powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\wenli\\code\\cerebro\\powershell\\oneplus12_remux_mp4.ps1\" -directory \"%V\""
