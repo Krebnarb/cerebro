@@ -178,6 +178,12 @@ def plot_clusters_with_connections(clusters, directory, cluster_to_filenames):
         title="Clustered Locations with Chronological Connections",
     )
 
+    # Update layout with custom center coordinates (lat, lon)
+    fig.update_layout(
+        mapbox_center={"lat": latitudes[0], "lon": longitudes[0]},  # Set your preferred lat, lon here
+        mapbox_zoom=5  # You can adjust the zoom level as needed
+    )
+
     fig.update_traces(marker=dict(size=20, color='green', opacity=0.5, symbol='circle'))
 
     # Add connections between clusters (lines connecting points)
