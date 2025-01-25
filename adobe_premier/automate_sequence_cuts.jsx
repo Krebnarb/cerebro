@@ -98,12 +98,23 @@ function assembleCutFromMarkers(duration, position) {
     // After the razer cut, go to the previous clip before the razor cut, and delete it
     
     var sourceSequence = getActiveSequence();
-    var targetSequence = copySequence(activeSequence, activeSequence.name + "_cut");
+    $.writeln("Copying Source sequence: " + sourceSequence.name);
+    // var targetSequence = copySequence(activeSequence, activeSequence.name + "_cut");
+    var targetSequence = getSequenceByName(sourceSequence.name + "_cut");
     
     var clips = sourceSequence.videoTracks[0].clips;
     
     for (var j = 0; j < clips.length; j++) {
+        $.writeln("Processing clip " + j + " of " + clips.length);
         var clip = sourceSequence.videoTracks[0].clips[j];
+
+        var clipSpeed = clip.getSpeed();
+
+        // correct start and end points for clipSpeed
+        var clipStart = clip.inPoint.seconds * clipSpeed;
+        var clipEnd = clip.outPoint.seconds * clipSpeed;
+        
+        
         var markers = clip.projectItem.getMarkers();
 
         if (markers && markers.numMarkers > 0) {
@@ -114,6 +125,9 @@ function assembleCutFromMarkers(duration, position) {
             for (var i = 0; i < markers.numMarkers; i++) {
                 var marker = markers[i]; // Get the current marker
                 var markerTimePoint = marker.start.seconds; // Get the marker's time in ticks
+                if (!(marker.start.seconds > clipStart && marker.start.seconds < clipEnd)) {
+                    continue;
+                }
 
                 // Calculate the start and end points for the razor cut
                 var markerCutStart = markerTimePoint - halfDuration;
@@ -134,6 +148,7 @@ function assembleCutFromMarkers(duration, position) {
             }
         }
     }
+    alert("All done!");
 }
 
 function getClipAtTimepoint(activeSequence, timePoint) {
@@ -209,5 +224,5 @@ function deleteClipBeforeCut(track, cutPoint) {
     }
 }
 
-assembleCutFromMarkers(2.59, "middle")
+assembleCutFromMarkers(2.83, "middle")
 

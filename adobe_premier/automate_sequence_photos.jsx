@@ -4,7 +4,10 @@ var activeSequence;
 var track;
 var globalZoomDirection = "in";
 var globalZoomStrength = 0.05;
-var globalZoomDuration = 1.71;
+var music_bpm = 85;
+var beats_sustain = 4;
+var globalZoomDuration = 60/music_bpm * beats_sustain; 
+
 
 function processPhotos() {
     activeSequence = getActiveSequence();
@@ -23,6 +26,11 @@ function processPhotos() {
             // Handle the photo clip (e.g., log its name or index)
             var clipName = clip.projectItem.name;
             var dim = extractClipWidthAndHeight(clip);
+            // Check if dim[0] is NaN
+            if (isNaN(dim[0])) {
+                alert("Skipping clip due to invalid dimensions.");
+                continue; // Skip processing this clip
+            }
             if (dim[0] < dim[1]) // portrait
                 scale = 1080 / dim[0] * 100 * 1.2;
             else // landscape
@@ -32,6 +40,7 @@ function processPhotos() {
             setZoomEffectOnImage(clip, globalZoomDirection, globalZoomStrength, globalZoomDuration)
         }
     }
+    alert("All done!");
 
 }
 
@@ -102,13 +111,17 @@ function setZoomEffectOnImage(clip, zoomDirection, strength, duration) {
     */
 
     clear_scale_keyframes(clip);
+    $.writeln("processing clip: " + clip.name);
 
     if (!zoomDirection) zoomDirection = "in"; // Default to "in" if not provided
     // Set the duration of the clip and enable ripple edit
     // clip.duration.setinsetInPoint(clip.start.seconds); // Assuming the clip's starting point
     clip.inPoint = clip.start.seconds;
     clip.outPoint = clip.end.seconds;
-    rippleEditClip(clip, duration);
+    duration = clip.end.seconds - clip.start.seconds;
+    // rippleEditClip(clip, duration);
+
+
     // clip.end = clip.start.seconds + duration;
 
     // Get the "Motion" effect's scale property
