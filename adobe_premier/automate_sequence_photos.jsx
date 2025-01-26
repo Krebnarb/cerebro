@@ -50,11 +50,15 @@ function isPhoto(clip) {
     var parts = filePath.split(".");
     var extension = parts[parts.length - 1].toLowerCase();
 
-    var photoExtensions = ['jpg', 'jpeg', 'png', 'tiff', 'bmp'];
+    const photoExtensions = ['jpg', 'jpeg', 'png', 'tiff', 'bmp'];
+    var isPhotoFlag = false;
+    for (var i = 0; i < photoExtensions.length; i++) {
+        if (extension === photoExtensions[i]) {
+            isPhotoFlag = true;
+        }
+    }
     
-    if (photoExtensions.indexOf(extension) > -1) return true;
-
-    return false;
+    return isPhotoFlag;
 }
 
 // Function to set the scale of a clip in a sequence
