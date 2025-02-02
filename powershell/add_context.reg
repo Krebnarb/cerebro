@@ -11,3 +11,11 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\SystemFileAssociations\.mp4\shell\Remux MP4\command]
 @="powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\wenli\\code\\cerebro\\powershell\\oneplus12_remux_mp4_file.ps1\" -filepath \"%1\""
+
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\CreateMP4Proxy]
+@="Create MP4 Proxy"
+"Icon"="C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\CreateMP4Proxy\command]
+@="powershell -NoExit -ExecutionPolicy Bypass -File \"%V\\video_proxies.ps1\" -inputDir \"%V\""
